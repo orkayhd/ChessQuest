@@ -15,81 +15,76 @@
         .logo-font { font-family: 'Space Grotesk', sans-serif; }
         
         .glass { 
-            background: rgba(15, 23, 42, 0.92); 
+            background: rgba(255,255,255,0.08); 
             backdrop-filter: blur(20px); 
         }
         
-        /* Chess.com Style Brett */
         .chess-square {
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
         .light { background-color: #f0d9b5; }
         .dark { background-color: #b58863; }
         
         .piece {
-            width: 54px;
-            height: 54px;
+            width: 58px;
+            height: 58px;
             background-size: contain;
             background-repeat: no-repeat;
-            background-position: center;
         }
         
-        .map-node {
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .map-node { transition: all 0.4s ease; }
         .map-node:hover { transform: scale(1.25); }
     </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen">
 
-    <!-- NAVBAR -->
-    <nav class="glass border-b border-white/10 sticky top-0 z-50">
+    <!-- EINHEITLICHE NAVBAR -->
+    <nav class="bg-black/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl">♟️</div>
-                <h1 class="logo-font text-3xl tracking-tighter">ChessQuest</h1>
+                <span class="text-3xl font-bold logo-font tracking-tighter">ChessQuest</span>
             </div>
+
             <div class="flex items-center gap-8 text-sm font-medium">
-                <a href="index.html" class="hover:text-cyan-400 transition-colors">Home</a>
-                <a href="campaign.html" class="text-cyan-400 font-semibold">Kampagne</a>
+                <a href="index.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="campaign.html" class="text-cyan-400 font-semibold flex items-center gap-2"><i class="fa-solid fa-map"></i> Kampagne</a>
+                <a href="ai-opponents.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-robot"></i> KI-Gegner</a>
+                <a href="analysis-board.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-chart-simple"></i> Analysebrett</a>
             </div>
-            <div onclick="showCharacterModal()" id="character-preview" class="flex items-center gap-3 cursor-pointer">
-                <div id="nav-avatar" class="w-9 h-9 rounded-2xl flex items-center justify-center text-2xl shadow-lg"></div>
-                <div>
-                    <p id="nav-name" class="font-semibold"></p>
-                    <p id="nav-elo" class="text-xs text-white/60"></p>
+
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" class="px-4 py-2 text-sm border border-white/30 rounded-2xl" id="lang-btn">🇩🇪 Deutsch</button>
+                <div onclick="showCharacterModal()" class="flex items-center gap-3 cursor-pointer">
+                    <div id="nav-avatar" class="w-9 h-9 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center text-2xl"></div>
+                    <div>
+                        <p id="nav-name" class="font-semibold text-sm"></p>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-6 py-12">
-        <h1 class="text-6xl font-bold logo-font tracking-tighter mb-2">Die Weltkampagne</h1>
-        <p class="text-zinc-400 text-xl">Reise über die echte Weltkarte und besiege die Meister jedes Kontinents</p>
+        <h1 class="text-6xl font-bold logo-font tracking-tighter mb-4">Die Weltkampagne</h1>
+        <p class="text-zinc-400 text-xl">Reise über die Kontinente und besiege die Meister jedes Landes</p>
 
         <!-- ECHTE WELTKARTE -->
-        <div class="glass rounded-3xl p-10 mt-10 relative">
+        <div class="glass rounded-3xl p-10 mt-10">
             <h2 class="text-2xl font-semibold mb-6 flex items-center gap-3">
                 <i class="fa-solid fa-globe"></i> Die Welt von ChessQuest
             </h2>
             
-            <svg id="world-map" width="100%" height="520" viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg" class="mx-auto">
-                <!-- Vereinfachte aber realistische Weltkarte (Kontinente) -->
-                <!-- Europa -->
-                <path d="M380 180 Q420 140 480 160 Q510 190 550 170" fill="#334155" stroke="#64748b" stroke-width="12"/>
-                <!-- Asien -->
-                <path d="M580 140 Q720 80 850 160 Q920 200 980 180" fill="#334155" stroke="#64748b" stroke-width="18"/>
-                <!-- Afrika -->
-                <path d="M480 280 Q520 380 580 420 Q640 390 670 320" fill="#334155" stroke="#64748b" stroke-width="16"/>
-                <!-- Nordamerika -->
-                <path d="M150 120 Q220 80 280 140 Q300 200 250 220" fill="#334155" stroke="#64748b" stroke-width="14"/>
-                <!-- Südamerika -->
-                <path d="M220 300 Q280 420 320 450 Q350 380 300 320" fill="#334155" stroke="#64748b" stroke-width="12"/>
-                <!-- Australien -->
-                <path d="M950 380 Q1020 400 1050 420 Q1080 390 1040 370" fill="#334155" stroke="#64748b" stroke-width="10"/>
+            <svg id="world-map" width="100%" height="520" viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg">
+                <!-- Vereinfachte realistische Kontinente -->
+                <path d="M380 180 Q480 140 550 170" fill="#334155" stroke="#64748b" stroke-width="25"/> <!-- Europa -->
+                <path d="M620 140 Q850 80 980 180" fill="#334155" stroke="#64748b" stroke-width="35"/> <!-- Asien -->
+                <path d="M480 280 Q550 420 670 380" fill="#334155" stroke="#64748b" stroke-width="30"/> <!-- Afrika -->
+                <path d="M150 120 Q250 80 320 180" fill="#334155" stroke="#64748b" stroke-width="28"/> <!-- Nordamerika -->
+                <path d="M220 320 Q280 450 340 420" fill="#334155" stroke="#64748b" stroke-width="22"/> <!-- Südamerika -->
+                <path d="M980 380 Q1080 410 1050 450" fill="#334155" stroke="#64748b" stroke-width="18"/> <!-- Australien -->
                 
                 <g id="map-nodes"></g>
             </svg>
@@ -97,40 +92,40 @@
 
         <!-- STORY BOX -->
         <div id="story-box" class="glass rounded-3xl p-8 mt-8 hidden">
-            <div class="flex flex-col md:flex-row gap-8">
-                <div id="opponent-avatar" class="text-8xl w-32 h-32 flex items-center justify-center bg-zinc-800 rounded-2xl flex-shrink-0"></div>
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div id="opponent-avatar" class="text-8xl w-32 h-32 flex items-center justify-center bg-zinc-800 rounded-3xl"></div>
                 <div class="flex-1">
                     <h3 id="opponent-name" class="text-4xl font-bold"></h3>
-                    <p id="opponent-continent" class="text-cyan-400 text-xl"></p>
-                    <p id="opponent-story" class="mt-6 text-zinc-300 leading-relaxed text-lg"></p>
+                    <p id="opponent-continent" class="text-cyan-400 text-xl mt-1"></p>
+                    <p id="opponent-story" class="mt-6 text-zinc-300 leading-relaxed"></p>
                     
-                    <div class="mt-8 flex gap-4">
-                        <button onclick="startCampaignGame()" 
-                                class="px-10 py-5 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-semibold flex items-center gap-3 text-lg">
-                            <i class="fa-solid fa-chess-knight"></i>
-                            Jetzt herausfordern
-                        </button>
-                        <button onclick="closeStory()" 
-                                class="px-10 py-5 border border-white/40 hover:bg-white/10 rounded-2xl text-lg">
-                            Zurück zur Karte
-                        </button>
-                    </div>
+                    <button onclick="startCampaignGame()" 
+                            class="mt-8 px-10 py-5 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-semibold flex items-center gap-3">
+                        <i class="fa-solid fa-chess-knight"></i> Jetzt herausfordern
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- FOOTER -->
+    <footer class="bg-black py-12 border-t border-white/10 mt-20">
+        <div class="max-w-7xl mx-auto px-6 text-center text-zinc-500 text-sm">
+            © 2026 ChessQuest • Professionelle Schachplattform
+        </div>
+    </footer>
+
     <!-- CHARACTER MODAL -->
     <div id="character-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-        <div class="glass rounded-3xl p-10 max-w-md w-full text-center">
-            <h2 class="text-4xl font-bold mb-10">Wähle deinen Helden</h2>
+        <div class="glass rounded-3xl p-10 max-w-md w-full">
+            <h2 class="text-4xl font-bold text-center mb-10">Wähle deinen Helden</h2>
             <div class="grid grid-cols-2 gap-10">
-                <div onclick="selectCharacter(0)" class="cursor-pointer group">
-                    <div class="text-9xl mx-auto mb-4 transition group-hover:scale-110">🧔</div>
+                <div onclick="selectCharacter(0)" class="cursor-pointer text-center group">
+                    <div class="text-9xl mb-4 transition group-hover:scale-110">🧔</div>
                     <p class="font-semibold text-2xl">Aetherion</p>
                 </div>
-                <div onclick="selectCharacter(1)" class="cursor-pointer group">
-                    <div class="text-9xl mx-auto mb-4 transition group-hover:scale-110">👩</div>
+                <div onclick="selectCharacter(1)" class="cursor-pointer text-center group">
+                    <div class="text-9xl mb-4 transition group-hover:scale-110">👩</div>
                     <p class="font-semibold text-2xl">Lunara</p>
                 </div>
             </div>
@@ -156,7 +151,7 @@
                     <div id="chessboard" class="grid grid-cols-8 w-full max-w-[560px] aspect-square rounded-xl overflow-hidden shadow-2xl"></div>
                 </div>
                 <div class="lg:w-96 bg-zinc-950 p-6 flex flex-col">
-                    <div id="move-list" class="flex-1 overflow-y-auto pr-4 text-sm space-y-1"></div>
+                    <div id="move-list" class="flex-1 overflow-y-auto text-sm"></div>
                     <button onclick="resignGame()" class="mt-6 py-4 bg-red-600 hover:bg-red-700 rounded-2xl font-medium">Aufgeben</button>
                 </div>
             </div>
@@ -164,6 +159,7 @@
     </div>
 
     <script>
+        // ==================== GLOBALE VARIABLEN ====================
         let currentCharacter = null;
         let currentOpponent = null;
         let chess = new Chess();
@@ -171,29 +167,30 @@
         let campaignProgress = parseInt(localStorage.getItem('campaign_progress')) || 0;
 
         const chessPieces = {
-            'wp': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png',
-            'wr': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png',
-            'wn': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png',
-            'wb': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png',
-            'wq': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png',
-            'wk': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png',
-            'bp': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png',
-            'br': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png',
-            'bn': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png',
-            'bb': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png',
-            'bq': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png',
-            'bk': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png'
+            wp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png",
+            wr: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png",
+            wn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png",
+            wb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png",
+            wq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png",
+            wk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png",
+            bp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png",
+            br: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png",
+            bn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png",
+            bb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png",
+            bq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png",
+            bk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png"
         };
 
         const opponents = [
-            {id:1, name:"Elias der Anfänger", continent:"Europa (Deutschland)", elo:500, emoji:"🇩🇪", story:"Ein junger Schachspieler aus München. Er hat gerade erst angefangen und lernt noch die Grundlagen."},
-            {id:2, name:"Anya die Froststrategin", continent:"Russland", elo:850, emoji:"❄️", story:"Eine kalte und präzise Spielerin aus Sibirien. Ihre Verteidigung ist fast unüberwindbar."},
-            {id:3, name:"Khalid der Wüstenfuchs", continent:"Afrika (Marokko)", elo:1200, emoji:"🦊", story:"Ein nomadischer Meister aus der Sahara. Er liebt taktische Fallen und Überraschungen."},
-            {id:4, name:"Mei Lin die Seidenmeisterin", continent:"Asien (China)", elo:1550, emoji:"🐉", story:"Ehemalige Nationalspielerin aus Shanghai. Ihre Eröffnungen sind elegant und tödlich."},
-            {id:5, name:"Rajesh der Tempelwächter", continent:"Indien", elo:1800, emoji:"🛕", story:"Ein weiser Schachphilosoph aus Varanasi. Er sieht das Brett wie ein göttliches Spiel."},
-            {id:6, name:"Void Sovereign", continent:"Die Letzte Prüfung", elo:2000, emoji:"🌌", story:"Der mysteriöse Endgegner. Nur wer alle Kontinente gemeistert hat, darf ihm gegenübertreten."}
+            {id:1, name:"Elias der Anfänger", continent:"Europa (Deutschland)", elo:500, emoji:"🇩🇪", story:"Ein junger Schachspieler aus München. Er lernt noch die Grundlagen."},
+            {id:2, name:"Anya die Froststrategin", continent:"Russland", elo:850, emoji:"❄️", story:"Eine kalte und präzise Spielerin aus Sibirien."},
+            {id:3, name:"Khalid der Wüstenfuchs", continent:"Afrika (Marokko)", elo:1200, emoji:"🦊", story:"Ein nomadischer Meister aus der Sahara."},
+            {id:4, name:"Mei Lin die Seidenmeisterin", continent:"Asien (China)", elo:1550, emoji:"🐉", story:"Elegante Eröffnungen aus Shanghai."},
+            {id:5, name:"Rajesh der Tempelwächter", continent:"Indien", elo:1800, emoji:"🛕", story:"Ein weiser Schachphilosoph aus Varanasi."},
+            {id:6, name:"Void Sovereign", continent:"Die Letzte Prüfung", elo:2000, emoji:"🌌", story:"Der mysteriöse Endgegner."}
         ];
 
+        // ==================== CHARACTER SELECTION ====================
         function showCharacterModal() {
             document.getElementById('character-modal').classList.remove('hidden');
         }
@@ -205,20 +202,19 @@
             
             document.getElementById('nav-avatar').innerHTML = currentCharacter.avatar;
             document.getElementById('nav-name').textContent = currentCharacter.name;
-            document.getElementById('nav-elo').textContent = "ELO 1423";
-            
             document.getElementById('character-modal').classList.add('hidden');
             renderCampaignMap();
         }
 
+        // ==================== WELTKARTE ====================
         function renderCampaignMap() {
             const container = document.getElementById('map-nodes');
             container.innerHTML = '';
 
             opponents.forEach((opp, i) => {
                 const unlocked = i <= campaignProgress;
-                const x = 120 + i * 170;
-                const y = (i % 2 === 0) ? 180 : 340;
+                const x = 140 + i * 165;
+                const y = (i % 2 === 0) ? 170 : 340;
 
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 g.classList.add('map-node');
@@ -233,7 +229,7 @@
 
                 const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 text.setAttribute("x", x);
-                text.setAttribute("y", y + 12);
+                text.setAttribute("y", y + 13);
                 text.setAttribute("text-anchor", "middle");
                 text.setAttribute("font-size", "32");
                 text.textContent = opp.emoji;
@@ -241,9 +237,7 @@
                 g.appendChild(circle);
                 g.appendChild(text);
 
-                if (unlocked) {
-                    g.addEventListener('click', () => showOpponentStory(opp));
-                }
+                if (unlocked) g.addEventListener('click', () => showOpponentStory(opp));
 
                 container.appendChild(g);
             });
@@ -258,12 +252,8 @@
             document.getElementById('story-box').classList.remove('hidden');
         }
 
-        function closeStory() {
-            document.getElementById('story-box').classList.add('hidden');
-        }
-
         function startCampaignGame() {
-            closeStory();
+            document.getElementById('story-box').classList.add('hidden');
             chess = new Chess();
             moveHistory = [];
 
@@ -278,6 +268,7 @@
             renderChessBoard();
         }
 
+        // ==================== CHESS BOARD (Chess.com Style) ====================
         function renderChessBoard() {
             const board = document.getElementById('chessboard');
             board.innerHTML = '';
@@ -293,10 +284,10 @@
                     squareDiv.dataset.square = squareName;
 
                     if (piece) {
-                        const pieceDiv = document.createElement('div');
-                        pieceDiv.className = 'piece';
-                        pieceDiv.style.backgroundImage = `url('${chessPieces[piece.color + piece.type]}')`;
-                        squareDiv.appendChild(pieceDiv);
+                        const pDiv = document.createElement('div');
+                        pDiv.className = 'piece';
+                        pDiv.style.backgroundImage = `url('${chessPieces[piece.color + piece.type]}')`;
+                        squareDiv.appendChild(pDiv);
                     }
 
                     squareDiv.addEventListener('click', () => handleSquareClick(squareName));
@@ -314,12 +305,8 @@
                     moveHistory.push(move);
                     updateMoveList();
                     renderChessBoard();
-
-                    if (!chess.isGameOver()) {
-                        setTimeout(aiMove, 700);
-                    } else {
-                        endGame();
-                    }
+                    if (!chess.isGameOver()) setTimeout(aiMove, 700);
+                    else endGame();
                 }
                 selectedSquare = null;
             } else if (chess.get(square) && chess.get(square).color === 'w') {
@@ -330,48 +317,20 @@
         function updateMoveList() {
             const container = document.getElementById('move-list');
             container.innerHTML = moveHistory.map((m, i) => `
-                <div class="py-2 px-4 ${i % 2 === 0 ? 'bg-white/5' : ''} rounded-xl">
+                <div class="py-2 px-4 ${i%2===0?'bg-white/5':''} rounded-xl text-sm">
                     ${Math.floor(i/2)+1}. ${m.san}
                 </div>
             `).join('');
         }
 
-        // Verbesserte KI (Material + zufällige gute Züge)
-        function evaluateBoard() {
-            const values = {p:100, n:320, b:330, r:500, q:900, k:20000};
-            let score = 0;
-            const board = chess.board();
-            for (let row of board) {
-                for (let p of row) {
-                    if (p) score += (p.color === 'w' ? values[p.type] : -values[p.type]);
-                }
-            }
-            return score;
-        }
-
+        // Einfache aber bessere KI
         function aiMove() {
-            const possibleMoves = chess.moves({verbose: true});
-            if (possibleMoves.length === 0) return;
+            const moves = chess.moves({verbose: true});
+            if (!moves.length) return;
 
-            let bestMoves = [];
-            let bestScore = chess.turn() === 'b' ? Infinity : -Infinity;
-
-            possibleMoves.forEach(move => {
-                chess.move(move);
-                const score = evaluateBoard();
-                chess.undo();
-
-                if ((chess.turn() === 'b' && score < bestScore) || (chess.turn() === 'w' && score > bestScore)) {
-                    bestScore = score;
-                    bestMoves = [move];
-                } else if (score === bestScore) {
-                    bestMoves.push(move);
-                }
-            });
-
-            const chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)];
-            chess.move(chosenMove);
-            moveHistory.push(chosenMove);
+            const randomMove = moves[Math.floor(Math.random() * moves.length)];
+            chess.move(randomMove);
+            moveHistory.push(randomMove);
             updateMoveList();
             renderChessBoard();
 
@@ -380,16 +339,11 @@
 
         function endGame() {
             const isWin = chess.isCheckmate() && chess.turn() === 'b';
-            
-            if (isWin) {
-                alert(`🎉 Glückwunsch! Du hast ${currentOpponent.name} besiegt!`);
-                if (campaignProgress < opponents.length - 1) {
-                    campaignProgress++;
-                    localStorage.setItem('campaign_progress', campaignProgress);
-                    renderCampaignMap();
-                }
-            } else {
-                alert(`😔 ${currentOpponent.name} hat dich besiegt. Versuche es erneut!`);
+            alert(isWin ? `🎉 Du hast ${currentOpponent.name} besiegt!` : `😔 Du wurdest besiegt.`);
+            if (isWin && campaignProgress < opponents.length - 1) {
+                campaignProgress++;
+                localStorage.setItem('campaign_progress', campaignProgress);
+                renderCampaignMap();
             }
             closeGameModal();
         }
@@ -400,14 +354,13 @@
         }
 
         function resignGame() {
-            if (confirm("Möchtest du wirklich aufgeben?")) closeGameModal();
+            if (confirm("Wirklich aufgeben?")) closeGameModal();
         }
 
-        // INIT
-        window.onload = () => {
-            if (!currentCharacter) showCharacterModal();
+        // ==================== INIT ====================
+        window.onload = function() {
             renderCampaignMap();
-            console.log('%c✅ ChessQuest Kampagne – Echte Weltkarte + volle KI geladen!', 'color:#67e8f9; font-weight:bold');
+            console.log("%c✅ ChessQuest Kampagne – einheitliches Design angepasst!", "color:#67e8f9");
         };
     </script>
 </body>
