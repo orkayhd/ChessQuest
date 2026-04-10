@@ -10,79 +10,202 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .logo-font { font-family: 'Space Grotesk', sans-serif; }
-        .nav-link { transition: all 0.2s; }
-        .nav-link:hover { color: #67e8f9; transform: translateY(-1px); }
+        .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); }
     </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen">
+<body class="bg-zinc-950 text-white min-h-screen" id="body">
 
-    <!-- EINHEITLICHE NAVBAR -->
+    <!-- NAVBAR -->
     <nav class="bg-black/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg">♟️</div>
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl">♟️</div>
                 <span class="text-3xl font-bold logo-font tracking-tighter">ChessQuest</span>
             </div>
 
-            <div class="flex items-center gap-10 text-sm font-medium">
-                <a href="index.html" class="nav-link flex items-center gap-2">
-                    <i class="fa-solid fa-house"></i> Home
-                </a>
-                <a href="campaign.html" class="nav-link flex items-center gap-2">
-                    <i class="fa-solid fa-map"></i> Kampagne
-                </a>
-                <a href="ai-opponents.html" class="nav-link flex items-center gap-2">
-                    <i class="fa-solid fa-robot"></i> KI-Gegner
-                </a>
-                <a href="analysis-board.html" class="nav-link flex items-center gap-2">
-                    <i class="fa-solid fa-chart-simple"></i> Analysebrett
-                </a>
+            <div class="flex items-center gap-8 text-sm font-medium">
+                <a href="index.html" class="hover:text-cyan-400">Home</a>
+                <a href="campaign.html" class="hover:text-cyan-400">Kampagne</a>
+                <a href="ai-opponents.html" class="hover:text-cyan-400">KI-Gegner</a>
+                <a href="analysis-board.html" class="hover:text-cyan-400">Analysebrett</a>
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 text-emerald-400 text-sm">
-                    <span class="relative flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                    </span>
-                    18.429 online
-                </div>
-                <button onclick="alert('Login kommt bald!')" 
-                        class="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-medium transition">
-                    Anmelden
+                <button onclick="toggleLanguage()" class="px-4 py-2 text-sm border border-white/30 rounded-2xl" id="lang-btn">🇩🇪 Deutsch</button>
+                <button onclick="toggleTheme()" class="px-4 py-2 text-sm border border-white/30 rounded-2xl">
+                    <i class="fa-solid fa-moon" id="theme-icon"></i>
                 </button>
+                <div onclick="showAuthModal()" id="user-section" class="flex items-center gap-3 cursor-pointer">
+                    <div id="user-avatar" class="w-9 h-9 rounded-2xl bg-cyan-500 flex items-center justify-center text-xl">♟️</div>
+                    <div>
+                        <p id="user-name" class="font-semibold text-sm">Gast</p>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- HERO -->
-    <div class="bg-gradient-to-br from-zinc-900 to-black min-h-screen flex items-center">
-        <div class="max-w-7xl mx-auto px-6 py-24 text-center">
-            <h1 class="text-7xl font-bold logo-font tracking-tighter mb-6">
-                Willkommen bei <span class="text-cyan-400">ChessQuest</span>
-            </h1>
-            <p class="text-2xl text-zinc-400 max-w-2xl mx-auto mb-12">
-                Die moderne Schachplattform mit Kampagne, starker KI und professionellem Analysebrett.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="campaign.html" 
-                   class="px-10 py-6 bg-white text-black font-semibold text-xl rounded-3xl hover:scale-105 transition flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-map"></i> Kampagne starten
-                </a>
-                <a href="ai-opponents.html" 
-                   class="px-10 py-6 border-2 border-cyan-400 text-cyan-400 font-semibold text-xl rounded-3xl hover:bg-cyan-400 hover:text-black transition flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-robot"></i> Gegen KI spielen
-                </a>
-                <a href="analysis-board.html" 
-                   class="px-10 py-6 border-2 border-white/60 hover:border-white font-semibold text-xl rounded-3xl transition flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-chart-simple"></i> Analysebrett öffnen
-                </a>
+    <div class="min-h-screen bg-gradient-to-br from-zinc-900 to-black flex items-center">
+        <div class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-12 gap-16 items-center">
+            <div class="lg:col-span-7">
+                <h1 class="text-7xl font-bold logo-font tracking-tighter mb-6" id="hero-title">Willkommen bei ChessQuest</h1>
+                <p class="text-2xl text-zinc-400" id="hero-subtitle">Die moderne Schachplattform mit Kampagne, starker KI und präzisem Analysebrett.</p>
+                
+                <div class="mt-12 flex flex-wrap gap-4">
+                    <a href="campaign.html" class="px-10 py-6 bg-white text-black font-semibold rounded-3xl text-xl">Kampagne starten</a>
+                    <a href="ai-opponents.html" class="px-10 py-6 border-2 border-cyan-400 text-cyan-400 font-semibold rounded-3xl text-xl">Gegen KI spielen</a>
+                    <a href="analysis-board.html" class="px-10 py-6 border-2 border-white/60 text-white font-semibold rounded-3xl text-xl">Analysebrett öffnen</a>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="glass p-8 rounded-3xl">
+                    <div id="hero-board" class="grid grid-cols-8 aspect-square bg-[#f0f0e0] rounded-2xl overflow-hidden border-4 border-[#b58863]"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="bg-zinc-900 rounded-3xl p-10 w-full max-w-md">
+            <h2 class="text-3xl font-bold text-center mb-8" id="modal-title">Anmelden</h2>
+
+            <!-- Login Form -->
+            <div id="login-form">
+                <input id="login-email" type="email" placeholder="E-Mail" class="w-full mb-4 bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4 text-white">
+                <button onclick="loginUser()" class="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-2xl">Anmelden</button>
+                <p onclick="switchToRegister()" class="text-center text-cyan-400 mt-6 cursor-pointer">Noch kein Account? Registrieren</p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="hidden">
+                <input id="reg-email" type="email" placeholder="E-Mail-Adresse" class="w-full mb-4 bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4">
+                <button onclick="sendVerificationCode()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-2xl">Bestätigungscode senden</button>
+                
+                <div id="code-section" class="hidden mt-6">
+                    <p class="text-sm text-zinc-400 mb-3">Wir haben einen 6-stelligen Code an <span id="sent-email" class="font-medium"></span> gesendet.</p>
+                    <input id="verification-code" type="text" maxlength="6" placeholder="123456" 
+                           class="w-full text-center text-3xl tracking-widest bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4">
+                    <button onclick="verifyCode()" class="w-full mt-4 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-2xl">Code bestätigen</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        console.log("%c✅ ChessQuest – Vollständige Website mit einheitlicher Navigation geladen!", "color:#67e8f9; font-size:16px");
+        let currentUser = JSON.parse(localStorage.getItem("chessquest_user")) || null;
+        let verificationCode = null;
+        let pendingEmail = "";
+
+        function updateUserUI() {
+            const userSection = document.getElementById("user-section");
+            if (currentUser) {
+                document.getElementById("user-name").textContent = currentUser.name || currentUser.email.split("@")[0];
+            }
+        }
+
+        function showAuthModal() {
+            document.getElementById("auth-modal").classList.remove("hidden");
+            switchToLogin();
+        }
+
+        function switchToLogin() {
+            document.getElementById("login-form").classList.remove("hidden");
+            document.getElementById("register-form").classList.add("hidden");
+        }
+
+        function switchToRegister() {
+            document.getElementById("login-form").classList.add("hidden");
+            document.getElementById("register-form").classList.remove("hidden");
+            document.getElementById("code-section").classList.add("hidden");
+        }
+
+        // Echter Code wird generiert und angezeigt
+        function sendVerificationCode() {
+            const email = document.getElementById("reg-email").value.trim();
+            if (!email || !email.includes("@")) {
+                alert("Bitte gib eine gültige E-Mail-Adresse ein.");
+                return;
+            }
+
+            pendingEmail = email;
+            verificationCode = Math.floor(100000 + Math.random() * 900000); // echter 6-stelliger Code
+
+            document.getElementById("sent-email").textContent = email;
+            document.getElementById("code-section").classList.remove("hidden");
+
+            alert(`✅ Ein Bestätigungscode wurde generiert!\n\nDein Code lautet: ${verificationCode}\n\n( In einer echten App würde dieser per E-Mail kommen. Hier siehst du ihn zur Demo. )`);
+        }
+
+        function verifyCode() {
+            const enteredCode = document.getElementById("verification-code").value.trim();
+            
+            if (enteredCode == verificationCode) {
+                currentUser = {
+                    email: pendingEmail,
+                    name: pendingEmail.split("@")[0],
+                    registeredAt: new Date().toISOString()
+                };
+                localStorage.setItem("chessquest_user", JSON.stringify(currentUser));
+                
+                alert("✅ Registrierung und Verifizierung erfolgreich! Du bist jetzt eingeloggt.");
+                document.getElementById("auth-modal").classList.add("hidden");
+                updateUserUI();
+            } else {
+                alert("❌ Falscher Code. Bitte versuche es erneut.");
+            }
+        }
+
+        function loginUser() {
+            const email = document.getElementById("login-email").value.trim();
+            if (!email) {
+                alert("Bitte E-Mail eingeben.");
+                return;
+            }
+
+            const savedUser = JSON.parse(localStorage.getItem("chessquest_user"));
+            if (savedUser && savedUser.email === email) {
+                currentUser = savedUser;
+                alert("✅ Erfolgreich eingeloggt!");
+                document.getElementById("auth-modal").classList.add("hidden");
+                updateUserUI();
+            } else {
+                alert("❌ Kein Account mit dieser E-Mail gefunden. Bitte zuerst registrieren.");
+            }
+        }
+
+        // Hero Board mit Chess.com Figuren
+        function renderHeroBoard() {
+            const container = document.getElementById("hero-board");
+            container.innerHTML = "";
+            const temp = new Chess("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+
+            for (let r = 8; r >= 1; r--) {
+                for (let f = 0; f < 8; f++) {
+                    const square = String.fromCharCode(97 + f) + r;
+                    const piece = temp.get(square);
+                    const div = document.createElement("div");
+                    div.className = `chess-square ${(r + f) % 2 === 1 ? 'light' : 'dark'}`;
+
+                    if (piece) {
+                        const p = document.createElement("div");
+                        p.style.backgroundImage = `url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${piece.color}${piece.type}.png')`;
+                        p.style.width = "54px";
+                        p.style.height = "54px";
+                        div.appendChild(p);
+                    }
+                    container.appendChild(div);
+                }
+            }
+        }
+
+        window.onload = () => {
+            renderHeroBoard();
+            updateUserUI();
+            console.log("%c✅ ChessQuest – Professionelle Version mit echtem Verifizierungs-Code geladen!", "color:#67e8f9");
+        };
     </script>
 </body>
 </html>
