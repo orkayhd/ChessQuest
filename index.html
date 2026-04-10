@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChessQuest • Die nächste Generation des Schachs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .logo-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0a0a0a 0%, #0f172a 50%, #1e2937 100%);
+        }
+        
+        .chess-square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.1rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            position: relative;
+        }
+        
+        @media (min-width: 640px) {
+            .chess-square {
+                font-size: 2.85rem;
+            }
+        }
+        
+        .light-square { 
+            background-color: #f0f0e0; 
+        }
+        .dark-square { 
+            background-color: #5a8c5a; 
+        }
+        
+        .chess-square:hover {
+            filter: brightness(1.08);
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            color: #67e8f9;
+            transform: translateY(-1px);
+        }
+        
+        .feature-card {
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2);
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-white min-h-screen overflow-x-hidden">
+    
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-lg border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">♟️</div>
+                <span class="text-3xl font-bold logo-font tracking-tighter text-white">ChessQuest</span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#" onclick="scrollToSection('features')" class="nav-link">Features</a>
+                <a href="campaign.html" class="nav-link">Kampagne</a>
+                <a href="#" onclick="openAnalysisDemo()" class="nav-link">Analysebrett</a>
+                <a href="#" class="nav-link">Puzzles</a>
+                <a href="#" class="nav-link">Turniere</a>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="text-emerald-400 text-sm font-medium flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    18.429 online
+                </div>
+                <button onclick="showLoginModal()" 
+                        class="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-semibold transition-all">
+                    Anmelden
+                </button>
+                <button onclick="showRegisterModal()" 
+                        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl text-sm font-semibold transition-all hover:scale-105">
+                    Kostenlos starten
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero-bg min-h-screen flex items-center pt-20">
+        <div class="max-w-7xl mx-auto px-6 py-20 lg:py-28 w-full">
+            <div class="grid lg:grid-cols-12 gap-16 items-center">
+                
+                <!-- Left Content -->
+                <div class="lg:col-span-7 space-y-8">
+                    <div class="inline-flex items-center gap-3 bg-white/10 px-6 py-3 rounded-3xl text-sm backdrop-blur-md">
+                        <span class="text-emerald-400">● Live</span>
+                        <span class="text-white/70">Willkommen zurück, Abenteurer</span>
+                    </div>
+                    
+                    <h1 class="text-6xl lg:text-7xl font-bold tracking-tighter logo-font leading-none">
+                        Schach neu<br>erleben.
+                    </h1>
+                    
+                    <p class="text-2xl text-white/70 max-w-2xl">
+                        Präzise Analyse • Starke KI • Epische Kampagne • 
+                        <span class="text-cyan-300">Dein Weg zum Meister.</span>
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                        <button onclick="window.location.href='campaign.html'" 
+                                class="group px-10 py-6 bg-white text-black font-semibold text-xl rounded-3xl flex items-center justify-center gap-x-3 hover:scale-[1.04] transition-all shadow-2xl shadow-cyan-500/20">
+                            <i class="fa-solid fa-map text-2xl group-active:rotate-12 transition-transform"></i>
+                            <span>Kampagne starten</span>
+                        </button>
+                        
+                        <button onclick="quickPlayAI()" 
+                                class="px-10 py-6 border-2 border-white/60 hover:border-cyan-400 font-semibold text-xl rounded-3xl flex items-center justify-center gap-x-3 transition-all hover:bg-white/5">
+                            <i class="fa-solid fa-robot"></i>
+                            <span>Gegen KI spielen</span>
+                        </button>
+                    </div>
+                    
+                    <div class="pt-12 flex items-center gap-10 text-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="text-4xl">🏆</div>
+                            <div>
+                                <p class="font-semibold">Monatliche Turniere</p>
+                                <p class="text-white/60">Mit echten Preisen</p>
+                            </div>
+                        </div>
+                        <div class="h-12 w-px bg-white/20"></div>
+                        <div>
+                            <p class="font-semibold text-cyan-300">Stockfish 16</p>
+                            <p class="text-white/60">Lokale WebAssembly Engine</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Board Preview -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-md">
+                        <div class="flex justify-between items-center mb-6 px-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner">♟️</div>
+                                <div>
+                                    <p class="font-medium">Du • 1423</p>
+                                </div>
+                            </div>
+                            <div class="px-5 py-1.5 bg-white/10 rounded-2xl text-xs font-mono">2:14</div>
+                            <div class="flex items-center gap-3 text-right">
+                                <div>
+                                    <p class="font-medium">Nova Knight • 1780</p>
+                                </div>
+                                <div class="w-10 h-10 bg-gradient-to-br from-rose-400 to-orange-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner">♞</div>
+                            </div>
+                        </div>
+                        
+                        <div id="hero-board" 
+                             class="grid grid-cols-8 aspect-square bg-[#f0f0e0] rounded-2xl overflow-hidden border-4 border-[#5a8c5a] shadow-inner mx-auto">
+                        </div>
+                        
+                        <div class="mt-6 text-center text-xs text-white/50 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-chess-knight"></i>
+                            <span>Live Vorschau • Stockfish Analyse aktiv</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURES SECTION -->
+    <div id="features" class="py-24 bg-[#0f172a]">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold logo-font tracking-tighter mb-4">Alles, was ein Schachspieler braucht</h2>
+                <p class="text-xl text-white/60 max-w-2xl mx-auto">
+                    Von der ersten Partie bis zum Turniersieg – ChessQuest begleitet dich auf jedem Schritt.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature Cards -->
+                <div class="feature-card bg-[#1e2937] rounded-3xl p-8 border border-white/10">
+                    <div class="w-14 h-14 bg-cyan-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6">📊</div>
+                    <h3 class="text-2xl font-semibold mb-3">Präzises Analysebrett</h3>
+                    <p class="text-white/70">Lokale Stockfish 16 Engine mit Pfeilen, Cloud-ähnlicher Tiefe und vollständiger Lichess-Kompatibilität.</p>
+                    <button onclick="openAnalysisDemo()" 
+                            class="mt-6 text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-2">
+                        Jetzt ausprobieren →
+                    </button>
+                </div>
+                
+                <div class="feature-card bg-[#1e2937] rounded-3xl p-8 border border-white/10">
+                    <div class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6">🌍</div>
+                    <h3 class="text-2xl font-semibold mb-3">Epische Kampagne</h3>
+                    <p class="text-white/70">Reise durch eine fesselnde Weltkarte, besiege Gegner und schalte neue Kapitel frei.</p>
+                </div>
+                
+                <div class="feature-card bg-[#1e2937] rounded-3xl p-8 border border-white/10">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6">🧩</div>
+                    <h3 class="text-2xl font-semibold mb-3">Taktik-Puzzles</h3>
+                    <p class="text-white/70">Tausende Puzzles mit steigendem Schwierigkeitsgrad und persönlichem Fortschritt.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-16 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 text-center text-white/50 text-sm">
+            <p>&copy; 2026 ChessQuest • Ein Projekt für die Schach-Community</p>
+            <p class="mt-2">Made with ❤️ für echte Schachspieler</p>
+        </div>
+    </footer>
+
+    <!-- Login & Register Modals (Platzhalter für späteres Auth-System) -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-[100]">
+        <div class="bg-[#1e2937] rounded-3xl p-10 max-w-md w-full mx-4">
+            <h3 class="text-3xl font-semibold mb-8 text-center">Willkommen zurück</h3>
+            <p class="text-center text-white/60 mb-8">Demo-Login (später mit Backend)</p>
+            <button onclick="fakeLogin()" 
+                    class="w-full py-4 bg-white text-black rounded-2xl font-semibold text-lg">
+                Als Gast einloggen
+            </button>
+            <button onclick="hideLoginModal()" 
+                    class="mt-4 w-full py-4 text-white/70 hover:text-white">
+                Abbrechen
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== HERO BOARD RENDER ====================
+        const unicodePieces = {
+            'K':'♔','Q':'♕','R':'♖','B':'♗','N':'♘','P':'♙',
+            'k':'♚','q':'♛','r':'♜','b':'♝','n':'♞','p':'♟'
+        };
+
+        function renderHeroBoard() {
+            const container = document.getElementById('hero-board');
+            const tempChess = new Chess("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"); // interessante Position
+            
+            container.innerHTML = '';
+            for (let rank = 8; rank >= 1; rank--) {
+                for (let file = 0; file < 8; file++) {
+                    const square = String.fromCharCode(97 + file) + rank;
+                    const piece = tempChess.get(square);
+                    const isLight = (rank + file) % 2 === 1;
+                    
+                    const div = document.createElement('div');
+                    div.className = `chess-square ${isLight ? 'light-square' : 'dark-square'}`;
+                    if (piece) {
+                        div.innerHTML = `<span>${unicodePieces[piece.type]}</span>`;
+                    }
+                    container.appendChild(div);
+                }
+            }
+        }
+
+        // ==================== QUICK ACTIONS ====================
+        function quickPlayAI() {
+            alert("🚀 KI-Spiel wird gestartet...\n\n(Nächster Schritt: Separate Spiel-Seite mit echter Stockfish-Integration)");
+            // Hier später: window.location.href = 'play.html?mode=ai';
+        }
+
+        function openAnalysisDemo() {
+            alert("🔬 Analysebrett wird geöffnet...\n\nDu hast bereits eine sehr gute Version davon erstellt.\nWir werden sie im nächsten Schritt noch stärker machen.");
+            // Hier später: window.location.href = 'analysis.html';
+        }
+
+        function showLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.getElementById('login-modal').classList.add('flex');
+        }
+
+        function hideLoginModal() {
+            const modal = document.getElementById('login-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function fakeLogin() {
+            hideLoginModal();
+            setTimeout(() => {
+                alert("✅ Erfolgreich als Gast eingeloggt!\n\nDein Fortschritt wird lokal gespeichert.");
+            }, 400);
+        }
+
+        function showRegisterModal() {
+            alert("🎉 Willkommen bei ChessQuest!\n\nIn der aktuellen Version kannst du sofort loslegen.");
+        }
+
+        function scrollToSection(section) {
+            document.getElementById(section).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==================== INIT ====================
+        window.onload = function() {
+            renderHeroBoard();
+            console.log('%c✅ ChessQuest Startseite v2.0 – Modern, performant und bereit für den nächsten Schritt', 'color:#67e8f9; font-weight:bold');
+        };
+    </script>
+</body>
+</html>
