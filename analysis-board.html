@@ -1,502 +1,361 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChessQuest • Analysebrett</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChessQuest • Analysebrett</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    body {
-        margin: 0;
-        font-family: 'Inter', system-ui, sans-serif;
-        background: #1e1e1e;
-        color: white;
-    }
-    .container {
-        display: flex;
-        max-width: 1280px;
-        margin: 30px auto;
-        gap: 24px;
-        padding: 0 20px;
-    }
-    #board-container {
-        position: relative;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    }
-    .board {
-        display: grid;
-        grid-template-columns: repeat(8, 72px);
-        grid-template-rows: repeat(8, 72px);
-        border: 6px solid #2a2a2a;
-        background: #222;
-    }
-    .square {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        cursor: pointer;
-    }
-    .light { background: #f0d9b5; }
-    .dark { background: #b58863; }
-    
-    .piece {
-        width: 62px;
-        height: 62px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        z-index: 5;
-    }
-    
-    .highlight::after {
-        content: '';
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        background: radial-gradient(circle, rgba(100, 255, 100, 0.6) 50%, transparent 70%);
-        border-radius: 50%;
-        z-index: 2;
-    }
-    .highlight.capture::after {
-        width: 60px;
-        height: 60px;
-        border: 6px solid rgba(255, 100, 100, 0.7);
-        background: transparent;
-    }
-    
-    .panel {
-        width: 380px;
-        background: #242424;
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    
-    .eval-bar-container {
-        height: 240px;
-        width: 32px;
-        background: #1a1a1a;
-        border: 3px solid #444;
-        border-radius: 6px;
-        position: relative;
-        overflow: hidden;
-    }
-    #eval-bar {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        transition: height 0.4s ease;
-    }
-    
-    svg#arrows {
-        position: absolute;
-        top: 0; left: 0;
-        width: 576px;
-        height: 576px;
-        pointer-events: none;
-        z-index: 10;
-    }
-    
-    button {
-        padding: 10px 16px;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.2s;
-    }
-    button:hover {
-        transform: translateY(-1px);
-    }
-</style>
-</head>
-<body>
-
-<div class="container">
-    <!-- BOARD -->
-    <div id="board-container">
-        <div class="board" id="board"></div>
-        <svg id="arrows" width="576" height="576" viewBox="0 0 576 576"></svg>
-    </div>
-
-    <!-- PANEL -->
-    <div class="panel">
-        <div class="flex justify-between items-center">
-            <h3 class="text-2xl font-semibold">Analysebrett</h3>
-            <span onclick="showEngineModal()" class="cursor-pointer text-2xl hover:text-cyan-400">⚙️</span>
-        </div>
-
-        <!-- ENGINE SECTION -->
-        <div class="bg-zinc-900 rounded-xl p-5">
-            <h4 class="font-medium mb-4 flex items-center gap-2">
-                <span class="text-emerald-400">♟</span> Stockfish 16 (lokal)
-            </h4>
-            <div class="flex gap-6">
-                <div class="eval-bar-container">
-                    <div id="eval-bar" class="bg-emerald-500"></div>
-                </div>
-                <div class="flex-1">
-                    <div id="eval-score" class="text-4xl font-bold">0.00</div>
-                    <div id="best-move" class="mt-3 text-sm bg-zinc-800 p-3 rounded-lg">Bester Zug: —</div>
-                </div>
-            </div>
-            <button onclick="startAnalysis()" 
-                    class="w-full mt-5 bg-emerald-600 hover:bg-emerald-500 py-3 font-semibold">
-                Analyse starten / neu berechnen
-            </button>
-        </div>
-
-        <!-- MOVES -->
-        <div>
-            <h4 class="font-medium mb-3">Zugliste</h4>
-            <div id="moves" class="bg-zinc-900 rounded-xl p-4 h-64 overflow-y-auto text-sm"></div>
-        </div>
-
-        <!-- OPENING EXPLORER -->
-        <div>
-            <h4 class="font-medium mb-3">📖 Opening Explorer</h4>
-            <div id="explorer" class="bg-zinc-900 rounded-xl p-4 h-52 overflow-y-auto text-sm"></div>
-        </div>
-
-        <!-- CONTROLS -->
-        <div class="grid grid-cols-3 gap-3">
-            <button onclick="undoMove()" class="bg-zinc-800 hover:bg-zinc-700">↩ Rückgängig</button>
-            <button onclick="flipBoard()" class="bg-zinc-800 hover:bg-zinc-700">🔄 Drehen</button>
-            <button onclick="resetBoard()" class="bg-zinc-800 hover:bg-zinc-700">♟ Reset</button>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="copyPGN()" class="bg-zinc-800 hover:bg-zinc-700">📋 PGN kopieren</button>
-            <button onclick="exportFEN()" class="bg-zinc-800 hover:bg-zinc-700">FEN kopieren</button>
-        </div>
-
-        <div class="flex gap-2">
-            <input id="fen-input" type="text" placeholder="FEN einfügen" 
-                   class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm">
-            <button onclick="loadFEN()" class="bg-cyan-600 hover:bg-cyan-500 px-6">Laden</button>
-        </div>
-    </div>
-</div>
-
-<!-- ENGINE MODAL -->
-<div id="engine-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-    <div class="bg-zinc-900 rounded-2xl p-8 w-full max-w-md">
-        <h3 class="text-xl font-semibold mb-6">Engine-Einstellungen</h3>
-        <div class="space-y-6">
-            <div>
-                <label class="block text-sm text-zinc-400 mb-2">Multi-PV (Anzahl Varianten)</label>
-                <input type="range" id="multipv-slider" min="1" max="5" value="3" class="w-full">
-                <span id="multipv-value" class="block text-center mt-2 font-mono">3</span>
-            </div>
-        </div>
-        <div class="flex gap-4 mt-10">
-            <button onclick="hideEngineModal()" class="flex-1 py-4 bg-zinc-800 rounded-xl">Abbrechen</button>
-            <button onclick="saveEngineSettings()" class="flex-1 py-4 bg-emerald-600 rounded-xl">Speichern</button>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stockfish@16/stockfish.wasm.js"></script>
-
-<script>
-// ====================== GLOBALE VARIABLEN ======================
-let chess = new Chess();
-let pgnMoves = [];
-let isFlipped = false;
-let selectedSquare = null;
-let stockfish = null;
-let multiPv = 3;
-let isAnalyzing = false;
-
-const boardEl = document.getElementById("board");
-const svgArrows = document.getElementById("arrows");
-const movesDiv = document.getElementById("moves");
-const explorerDiv = document.getElementById("explorer");
-
-// Chess.com Piece URLs
-const pieces = {
-    wp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png",
-    wr: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png",
-    wn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png",
-    wb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png",
-    wq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png",
-    wk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png",
-    bp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png",
-    br: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png",
-    bn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png",
-    bb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png",
-    bq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png",
-    bk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png"
-};
-
-// ====================== STOCKFISH INITIALISIERUNG ======================
-function initStockfish() {
-    stockfish = STOCKFISH();
-    stockfish.onmessage = function(event) {
-        const line = event.data;
-        if (line.startsWith("info depth")) {
-            handleStockfishOutput(line);
-        }
-    };
-}
-
-// Verarbeitet die Stockfish-Ausgabe
-function handleStockfishOutput(line) {
-    if (!isAnalyzing) return;
-    
-    const depthMatch = line.match(/depth (\d+)/);
-    const scoreMatch = line.match(/score cp (-?\d+)/) || line.match(/score mate (-?\d+)/);
-    const pvMatch = line.match(/pv ([a-h][1-8][a-h][1-8])/);
-
-    if (depthMatch && scoreMatch) {
-        const depth = depthMatch[1];
-        let score = scoreMatch[1];
-        const isMate = line.includes("mate");
-
-        let evalText = isMate ? `#${score}` : (score > 0 ? `+${(score/100).toFixed(2)}` : (score/100).toFixed(2));
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
         
-        document.getElementById("eval-score").textContent = evalText;
-        document.getElementById("eval-score").style.color = score >= 0 ? "#4ade80" : "#f87171";
-
-        // Eval Bar
-        let percent = isMate ? (score > 0 ? 95 : 5) : Math.max(5, Math.min(95, 50 + parseFloat(score)/8));
-        document.getElementById("eval-bar").style.height = percent + "%";
-        document.getElementById("eval-bar").style.background = score >= 0 ? "#4ade80" : "#f87171";
-    }
-
-    if (pvMatch) {
-        const bestUCI = pvMatch[1];
-        const temp = new Chess(chess.fen());
-        const move = temp.move({from: bestUCI.slice(0,2), to: bestUCI.slice(2,4), promotion: 'q'});
-        if (move) {
-            document.getElementById("best-move").innerHTML = `<strong>Bester Zug:</strong> ${move.san}`;
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .logo-font { font-family: 'Space Grotesk', sans-serif; }
+        
+        .glass { 
+            background: rgba(255,255,255,0.08); 
+            backdrop-filter: blur(20px); 
         }
-        drawBestMoveArrow(bestUCI);
-    }
-}
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 72px);
+            grid-template-rows: repeat(8, 72px);
+            border: 6px solid #2a2a2a;
+            background: #1f1f1f;
+        }
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
+        .light { background-color: #f0d9b5; }
+        .dark { background-color: #b58863; }
+        
+        .piece {
+            width: 62px;
+            height: 62px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .highlight::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: radial-gradient(circle, rgba(74, 222, 128, 0.6) 50%, transparent);
+            border-radius: 50%;
+        }
+        .highlight.capture::after {
+            width: 64px;
+            height: 64px;
+            border: 5px solid rgba(248, 113, 113, 0.7);
+            background: transparent;
+        }
+        
+        svg#arrows {
+            position: absolute;
+            top: 0; left: 0;
+            width: 576px;
+            height: 576px;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen">
 
-function drawBestMoveArrow(uci) {
-    svgArrows.innerHTML = "";
-    const from = uci.substring(0,2);
-    const to = uci.substring(2,4);
-    
-    const size = 72;
-    const offset = 36;
-    
-    let fromX = (from.charCodeAt(0) - 97) * size + offset;
-    let fromY = (8 - parseInt(from[1])) * size + offset;
-    let toX = (to.charCodeAt(0) - 97) * size + offset;
-    let toY = (8 - parseInt(to[1])) * size + offset;
+    <!-- EINHEITLICHE NAVBAR -->
+    <nav class="bg-black/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl">♟️</div>
+                <span class="text-3xl font-bold logo-font tracking-tighter">ChessQuest</span>
+            </div>
 
-    if (isFlipped) {
-        fromX = 576 - fromX; fromY = 576 - fromY;
-        toX = 576 - toX; toY = 576 - toY;
-    }
+            <div class="flex items-center gap-8 text-sm font-medium">
+                <a href="index.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="campaign.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-map"></i> Kampagne</a>
+                <a href="ai-opponents.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-robot"></i> KI-Gegner</a>
+                <a href="analysis-board.html" class="text-cyan-400 font-semibold flex items-center gap-2"><i class="fa-solid fa-chart-simple"></i> Analysebrett</a>
+            </div>
 
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", fromX);
-    line.setAttribute("y1", fromY);
-    line.setAttribute("x2", toX);
-    line.setAttribute("y2", toY);
-    line.setAttribute("stroke", "#4ade80");
-    line.setAttribute("stroke-width", "8");
-    line.setAttribute("stroke-opacity", "0.9");
-    line.setAttribute("marker-end", "url(#arrow)");
-    svgArrows.appendChild(line);
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" class="px-4 py-2 text-sm border border-white/30 rounded-2xl" id="lang-btn">🇩🇪 Deutsch</button>
+            </div>
+        </div>
+    </nav>
 
-    // Arrowhead
-    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-    const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-    marker.setAttribute("id", "arrow");
-    marker.setAttribute("markerWidth", "10");
-    marker.setAttribute("markerHeight", "10");
-    marker.setAttribute("refX", "8");
-    marker.setAttribute("refY", "5");
-    marker.setAttribute("orient", "auto");
-    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-    poly.setAttribute("points", "0 0, 10 5, 0 10");
-    poly.setAttribute("fill", "#4ade80");
-    marker.appendChild(poly);
-    defs.appendChild(marker);
-    svgArrows.appendChild(defs);
-}
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h1 class="text-5xl font-bold logo-font tracking-tighter">Analysebrett</h1>
+                <p class="text-zinc-400 text-lg">Analysiere deine Partien mit starker Stockfish-Engine</p>
+            </div>
+        </div>
 
-// ====================== BOARD RENDERING ======================
-function renderBoard(highlightMoves = []) {
-    boardEl.innerHTML = "";
-    const startRow = isFlipped ? 7 : 0;
-    const endRow = isFlipped ? -1 : 8;
-    const step = isFlipped ? -1 : 1;
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- BOARD -->
+            <div class="flex-1">
+                <div id="board-container" class="relative inline-block">
+                    <div class="board" id="board"></div>
+                    <svg id="arrows" width="576" height="576" viewBox="0 0 576 576"></svg>
+                </div>
+            </div>
 
-    for (let r = startRow; r !== endRow; r += step) {
-        for (let c = 0; c < 8; c++) {
-            const squareName = String.fromCharCode(97 + c) + (8 - r);
-            const square = document.createElement("div");
-            square.className = `square ${(r + c) % 2 === 0 ? "light" : "dark"}`;
-            square.dataset.square = squareName;
+            <!-- SIDEBAR -->
+            <div class="w-full lg:w-96 space-y-6">
+                <!-- Engine -->
+                <div class="glass rounded-3xl p-6">
+                    <h3 class="font-semibold mb-4 flex items-center gap-2">
+                        <span class="text-emerald-400">♟</span> Stockfish 16 Analyse
+                    </h3>
+                    <div class="flex gap-6">
+                        <div class="w-10 h-60 bg-zinc-800 rounded-2xl overflow-hidden relative">
+                            <div id="eval-bar" class="absolute bottom-0 w-full bg-emerald-500 transition-all"></div>
+                        </div>
+                        <div class="flex-1">
+                            <div id="eval-score" class="text-5xl font-bold">0.00</div>
+                            <div id="best-move" class="mt-4 bg-zinc-800 p-4 rounded-2xl text-sm">Bester Zug: —</div>
+                        </div>
+                    </div>
+                    <button onclick="startAnalysis()" 
+                            class="mt-6 w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-semibold">
+                        Analyse starten
+                    </button>
+                </div>
 
-            const piece = chess.get(squareName);
-            if (piece) {
-                const div = document.createElement("div");
-                div.className = "piece";
-                div.style.backgroundImage = `url('${pieces[piece.color + piece.type]}')`;
-                square.appendChild(div);
+                <!-- Moves -->
+                <div class="glass rounded-3xl p-6">
+                    <h4 class="font-medium mb-4">Zugliste</h4>
+                    <div id="moves" class="bg-zinc-900 rounded-2xl p-5 h-64 overflow-y-auto text-sm"></div>
+                </div>
+
+                <!-- Explorer -->
+                <div class="glass rounded-3xl p-6">
+                    <h4 class="font-medium mb-4">📖 Opening Explorer</h4>
+                    <div id="explorer" class="bg-zinc-900 rounded-2xl p-5 h-52 overflow-y-auto text-sm"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="undoMove()" class="glass py-4 rounded-2xl hover:bg-white/10">↩ Rückgängig</button>
+                    <button onclick="flipBoard()" class="glass py-4 rounded-2xl hover:bg-white/10">🔄 Drehen</button>
+                    <button onclick="resetBoard()" class="glass py-4 rounded-2xl hover:bg-white/10">Reset</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="copyPGN()" class="glass py-4 rounded-2xl hover:bg-white/10">PGN kopieren</button>
+                    <button onclick="exportFEN()" class="glass py-4 rounded-2xl hover:bg-white/10">FEN kopieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-12 border-t border-white/10 mt-20">
+        <div class="max-w-7xl mx-auto px-6 text-center text-zinc-500 text-sm">
+            © 2026 ChessQuest • Professionelle Schachplattform
+        </div>
+    </footer>
+
+    <script>
+        let chess = new Chess();
+        let pgnMoves = [];
+        let isFlipped = false;
+        let selectedSquare = null;
+        let stockfish = null;
+
+        const chessPieces = {
+            wp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png",
+            wr: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png",
+            wn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png",
+            wb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png",
+            wq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png",
+            wk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png",
+            bp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png",
+            br: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png",
+            bn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png",
+            bb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png",
+            bq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png",
+            bk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png"
+        };
+
+        const boardEl = document.getElementById("board");
+        const svgArrows = document.getElementById("arrows");
+        const movesDiv = document.getElementById("moves");
+        const explorerDiv = document.getElementById("explorer");
+
+        // Stockfish initialisieren
+        function initStockfish() {
+            stockfish = STOCKFISH();
+            stockfish.onmessage = (event) => {
+                const line = event.data;
+                if (line.includes("info depth") && line.includes("pv")) {
+                    processStockfishOutput(line);
+                }
+            };
+        }
+
+        function processStockfishOutput(line) {
+            const scoreMatch = line.match(/score cp (-?\d+)/);
+            const pvMatch = line.match(/pv ([a-h][1-8][a-h][1-8])/);
+
+            if (scoreMatch) {
+                let score = parseInt(scoreMatch[1]) / 100;
+                document.getElementById("eval-score").textContent = score >= 0 ? "+" + score.toFixed(2) : score.toFixed(2);
+                document.getElementById("eval-bar").style.height = Math.max(5, Math.min(95, 50 + score * 8)) + "%";
             }
 
-            if (highlightMoves.includes(squareName)) {
-                square.classList.add(chess.get(squareName) ? "highlight capture" : "highlight");
+            if (pvMatch) {
+                const uci = pvMatch[1];
+                drawArrow(uci);
+            }
+        }
+
+        function drawArrow(uci) {
+            svgArrows.innerHTML = "";
+            const from = uci.substring(0,2);
+            const to = uci.substring(2,4);
+
+            const size = 72;
+            let fromX = (from.charCodeAt(0) - 97) * size + 36;
+            let fromY = (8 - parseInt(from[1])) * size + 36;
+            let toX = (to.charCodeAt(0) - 97) * size + 36;
+            let toY = (8 - parseInt(to[1])) * size + 36;
+
+            if (isFlipped) {
+                fromX = 576 - fromX; fromY = 576 - fromY;
+                toX = 576 - toX; toY = 576 - toY;
             }
 
-            square.addEventListener("click", () => handleSquareClick(squareName));
-            boardEl.appendChild(square);
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", fromX);
+            line.setAttribute("y1", fromY);
+            line.setAttribute("x2", toX);
+            line.setAttribute("y2", toY);
+            line.setAttribute("stroke", "#4ade80");
+            line.setAttribute("stroke-width", "7");
+            line.setAttribute("marker-end", "url(#arrowhead)");
+            svgArrows.appendChild(line);
         }
-    }
-}
 
-// ====================== INTERACTION ======================
-function handleSquareClick(squareName) {
-    if (selectedSquare) {
-        const move = chess.move({from: selectedSquare, to: squareName, promotion: 'q'});
-        if (move) {
-            pgnMoves.push(move.san);
-            renderMoves();
+        function startAnalysis() {
+            if (!stockfish) initStockfish();
+            const fen = chess.fen();
+            stockfish.postMessage("position fen " + fen);
+            stockfish.postMessage("go depth 16");
+        }
+
+        // Board Rendering
+        function renderBoard(highlight = []) {
+            boardEl.innerHTML = "";
+            const start = isFlipped ? 7 : 0;
+            const step = isFlipped ? -1 : 1;
+
+            for (let r = start; r !== (isFlipped ? -1 : 8); r += step) {
+                for (let c = 0; c < 8; c++) {
+                    const squareName = String.fromCharCode(97 + c) + (8 - r);
+                    const square = document.createElement("div");
+                    square.className = `square ${(r + c) % 2 === 0 ? "light" : "dark"}`;
+                    square.dataset.square = squareName;
+
+                    const piece = chess.get(squareName);
+                    if (piece) {
+                        const p = document.createElement("div");
+                        p.className = "piece";
+                        p.style.backgroundImage = `url('${chessPieces[piece.color + piece.type]}')`;
+                        square.appendChild(p);
+                    }
+
+                    if (highlight.includes(squareName)) {
+                        square.classList.add(chess.get(squareName) ? "highlight capture" : "highlight");
+                    }
+
+                    square.addEventListener("click", () => handleClick(squareName));
+                    boardEl.appendChild(square);
+                }
+            }
+        }
+
+        let selectedSquare = null;
+
+        function handleClick(square) {
+            if (selectedSquare) {
+                const move = chess.move({from: selectedSquare, to: square, promotion: 'q'});
+                if (move) {
+                    pgnMoves.push(move.san);
+                    renderMoves();
+                    renderBoard();
+                    startAnalysis();
+                    selectedSquare = null;
+                    return;
+                }
+                selectedSquare = null;
+            }
+
+            if (chess.get(square) && chess.get(square).color === chess.turn()) {
+                selectedSquare = square;
+                const legal = chess.moves({square: square, verbose: true}).map(m => m.to);
+                renderBoard(legal);
+            }
+        }
+
+        function renderMoves() {
+            movesDiv.innerHTML = pgnMoves.map((san, i) => `
+                <div class="py-2 px-4 ${i%2===0 ? 'bg-white/5' : ''} rounded-xl">${Math.floor(i/2)+1}. ${san}</div>
+            `).join('');
+        }
+
+        function undoMove() {
+            if (pgnMoves.length === 0) return;
+            pgnMoves.pop();
+            chess = new Chess();
+            pgnMoves.forEach(s => chess.move(s));
             renderBoard();
-            startAnalysis(); // Automatische Analyse nach Zug
-            selectedSquare = null;
-            return;
+            renderMoves();
+            startAnalysis();
         }
-        selectedSquare = null;
-    }
 
-    const piece = chess.get(squareName);
-    if (piece && piece.color === chess.turn()) {
-        selectedSquare = squareName;
-        const legal = chess.moves({square: squareName, verbose: true}).map(m => m.to);
-        renderBoard(legal);
-    } else {
-        selectedSquare = null;
-        renderBoard();
-    }
-}
-
-// ====================== ANALYSIS ======================
-function startAnalysis() {
-    if (!stockfish) {
-        initStockfish();
-        setTimeout(startAnalysis, 800);
-        return;
-    }
-
-    isAnalyzing = true;
-    const fen = chess.fen();
-    stockfish.postMessage("position fen " + fen);
-    stockfish.postMessage(`go depth 18`);
-}
-
-// ====================== ZUGLISTE ======================
-function renderMoves() {
-    movesDiv.innerHTML = "";
-    let html = "";
-    let moveNum = 1;
-    for (let i = 0; i < pgnMoves.length; i++) {
-        if (i % 2 === 0) {
-            html += `<span class="move-number">${moveNum}.</span> `;
-            moveNum++;
+        function resetBoard() {
+            chess = new Chess();
+            pgnMoves = [];
+            isFlipped = false;
+            renderBoard();
+            renderMoves();
         }
-        html += `<span class="move">${pgnMoves[i]} </span>`;
-    }
-    movesDiv.innerHTML = html || "<small class='text-zinc-500'>Noch keine Züge gespielt</small>";
-}
 
-// ====================== WEITERE FUNKTIONEN ======================
-function undoMove() {
-    if (pgnMoves.length === 0) return;
-    pgnMoves.pop();
-    chess = new Chess();
-    pgnMoves.forEach(san => chess.move(san));
-    renderBoard();
-    renderMoves();
-    startAnalysis();
-}
+        function flipBoard() {
+            isFlipped = !isFlipped;
+            renderBoard();
+        }
 
-function resetBoard() {
-    chess = new Chess();
-    pgnMoves = [];
-    isFlipped = false;
-    renderBoard();
-    renderMoves();
-    document.getElementById("best-move").innerHTML = "Bester Zug: —";
-    startAnalysis();
-}
+        function copyPGN() {
+            navigator.clipboard.writeText(chess.pgn());
+            alert("PGN kopiert!");
+        }
 
-function flipBoard() {
-    isFlipped = !isFlipped;
-    renderBoard();
-}
+        function exportFEN() {
+            navigator.clipboard.writeText(chess.fen());
+            alert("FEN kopiert!");
+        }
 
-function loadFEN() {
-    const fen = document.getElementById("fen-input").value.trim();
-    if (chess.load(fen)) {
-        pgnMoves = [];
-        renderBoard();
-        renderMoves();
-        startAnalysis();
-    } else {
-        alert("Ungültiger FEN-String!");
-    }
-}
+        function toggleLanguage() {
+            alert("Sprachumschaltung wird bald global verfügbar sein.");
+        }
 
-function exportFEN() {
-    navigator.clipboard.writeText(chess.fen());
-    alert("FEN kopiert!");
-}
-
-function copyPGN() {
-    navigator.clipboard.writeText(chess.pgn());
-    alert("PGN kopiert!");
-}
-
-function showEngineModal() {
-    document.getElementById("engine-modal").classList.remove("hidden");
-}
-
-function hideEngineModal() {
-    document.getElementById("engine-modal").classList.add("hidden");
-}
-
-function saveEngineSettings() {
-    multiPv = parseInt(document.getElementById("multipv-slider").value);
-    hideEngineModal();
-    startAnalysis();
-}
-
-// ====================== OPENING EXPLORER ======================
-async function loadExplorer() {
-    try {
-        const res = await fetch(`https://explorer.lichess.org/master?fen=${encodeURIComponent(chess.fen())}`);
-        const data = await res.json();
-        // ... (kann später erweitert werden)
-        explorerDiv.innerHTML = `<small class="text-emerald-400">Explorer geladen (${data.white + data.draws + data.black} Spiele)</small>`;
-    } catch(e) {
-        explorerDiv.innerHTML = `<small class="text-zinc-500">Explorer temporär nicht verfügbar</small>`;
-    }
-}
-
-// ====================== INIT ======================
-window.onload = function() {
-    initStockfish();
-    renderBoard();
-    renderMoves();
-    loadExplorer();
-    console.log("%c✅ ChessQuest Analysebrett mit echter Stockfish Engine gestartet!", "color:#4ade80; font-weight:bold");
-};
-</script>
+        // Init
+        window.onload = function() {
+            initStockfish();
+            renderBoard();
+            renderMoves();
+            console.log("%c✅ ChessQuest Analysebrett – einheitliches Design fertig!", "color:#67e8f9; font-weight:bold");
+        };
+    </script>
 </body>
 </html>
