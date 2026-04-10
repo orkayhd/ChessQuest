@@ -4,65 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChessQuest • Schach neu erleben</title>
-    
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-        
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-        }
-        .logo-font {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-        
-        .hero-bg {
-            background: linear-gradient(135deg, #0a0a0a 0%, #0f172a 60%, #1e2937 100%);
-        }
-        
-        .chess-square {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.4rem;
-            transition: all 0.2s ease;
-        }
-        
-        @media (min-width: 640px) {
-            .chess-square { font-size: 3.2rem; }
-        }
-        
-        .light-square { background-color: #f0f0e0; }
-        .dark-square { background-color: #5a8c5a; }
-        
-        .glass {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.12);
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .logo-font { font-family: 'Space Grotesk', sans-serif; }
+        .nav-link { transition: all 0.2s; }
+        .nav-link:hover { color: #67e8f9; transform: translateY(-1px); }
     </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen">
 
-    <!-- NAVBAR -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-lg border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+    <!-- EINHEITLICHE NAVBAR -->
+    <nav class="bg-black/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl">♟️</div>
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg">♟️</div>
                 <span class="text-3xl font-bold logo-font tracking-tighter">ChessQuest</span>
             </div>
-            
-            <div class="hidden md:flex gap-8 text-sm font-medium">
-                <a href="#" class="hover:text-cyan-400 transition-colors">Features</a>
-                <a href="campaign.html" class="hover:text-cyan-400 transition-colors">Kampagne</a>
-                <a href="#" class="hover:text-cyan-400 transition-colors">Analysebrett</a>
-                <a href="#" class="hover:text-cyan-400 transition-colors">Puzzles</a>
-                <a href="#" class="hover:text-cyan-400 transition-colors">Turniere</a>
+
+            <div class="flex items-center gap-10 text-sm font-medium">
+                <a href="index.html" class="nav-link flex items-center gap-2">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <a href="campaign.html" class="nav-link flex items-center gap-2">
+                    <i class="fa-solid fa-map"></i> Kampagne
+                </a>
+                <a href="ai-opponents.html" class="nav-link flex items-center gap-2">
+                    <i class="fa-solid fa-robot"></i> KI-Gegner
+                </a>
+                <a href="analysis-board.html" class="nav-link flex items-center gap-2">
+                    <i class="fa-solid fa-chart-simple"></i> Analysebrett
+                </a>
             </div>
-            
+
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 text-emerald-400 text-sm">
                     <span class="relative flex h-3 w-3">
@@ -71,129 +47,42 @@
                     </span>
                     18.429 online
                 </div>
-                <button onclick="showLoginModal()" 
-                        class="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-medium transition-all">
+                <button onclick="alert('Login kommt bald!')" 
+                        class="px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-medium transition">
                     Anmelden
-                </button>
-                <button onclick="showRegisterModal()" 
-                        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 rounded-2xl text-sm font-semibold transition-all">
-                    Kostenlos starten
                 </button>
             </div>
         </div>
     </nav>
 
     <!-- HERO -->
-    <div class="hero-bg min-h-screen flex items-center pt-20">
-        <div class="max-w-7xl mx-auto px-6 py-24 w-full">
-            <div class="grid lg:grid-cols-12 gap-16 items-center">
-                
-                <!-- Linke Seite -->
-                <div class="lg:col-span-7 space-y-10">
-                    <div class="inline-flex items-center gap-3 bg-white/10 px-6 py-3 rounded-3xl text-sm">
-                        <span class="text-emerald-400">● Live</span>
-                        <span>Willkommen zurück, Abenteurer</span>
-                    </div>
-                    
-                    <h1 class="text-6xl lg:text-7xl font-bold tracking-tighter logo-font leading-none">
-                        Schach neu<br>erleben.
-                    </h1>
-                    
-                    <p class="text-2xl text-zinc-400 max-w-xl">
-                        Präzise Analyse • Starke KI • Epische Kampagne • 
-                        Dein Weg zum Meister.
-                    </p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <button onclick="window.location.href='campaign.html'" 
-                                class="px-10 py-6 bg-white text-black font-semibold text-xl rounded-3xl flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl">
-                            <i class="fa-solid fa-map"></i>
-                            Kampagne starten
-                        </button>
-                        
-                        <button onclick="quickPlayAI()" 
-                                class="px-10 py-6 border-2 border-white/60 hover:border-white font-semibold text-xl rounded-3xl flex items-center justify-center gap-3 transition-all hover:bg-white/5">
-                            <i class="fa-solid fa-robot"></i>
-                            Gegen KI spielen
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Rechte Seite - Hero Board -->
-                <div class="lg:col-span-5 flex justify-center">
-                    <div class="glass p-8 rounded-3xl w-full max-w-md">
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl">♟️</div>
-                                <div>
-                                    <p class="font-medium">Du • 1423</p>
-                                </div>
-                            </div>
-                            <div class="px-5 py-1 bg-white/10 rounded-2xl text-xs font-mono">2:14</div>
-                            <div class="flex items-center gap-3">
-                                <div class="text-right">
-                                    <p class="font-medium">Nova Knight • 1780</p>
-                                </div>
-                                <div class="w-10 h-10 bg-gradient-to-br from-rose-400 to-orange-500 rounded-2xl flex items-center justify-center text-3xl">♞</div>
-                            </div>
-                        </div>
-                        
-                        <div id="hero-board" 
-                             class="grid grid-cols-8 aspect-square bg-[#f0f0e0] rounded-2xl overflow-hidden border-4 border-[#5a8c5a] shadow-inner">
-                        </div>
-                        
-                        <div class="mt-6 text-center text-xs text-zinc-400 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-chess-knight"></i>
-                            Live Vorschau • Stockfish Analyse aktiv
-                        </div>
-                    </div>
-                </div>
+    <div class="bg-gradient-to-br from-zinc-900 to-black min-h-screen flex items-center">
+        <div class="max-w-7xl mx-auto px-6 py-24 text-center">
+            <h1 class="text-7xl font-bold logo-font tracking-tighter mb-6">
+                Willkommen bei <span class="text-cyan-400">ChessQuest</span>
+            </h1>
+            <p class="text-2xl text-zinc-400 max-w-2xl mx-auto mb-12">
+                Die moderne Schachplattform mit Kampagne, starker KI und professionellem Analysebrett.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="campaign.html" 
+                   class="px-10 py-6 bg-white text-black font-semibold text-xl rounded-3xl hover:scale-105 transition flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-map"></i> Kampagne starten
+                </a>
+                <a href="ai-opponents.html" 
+                   class="px-10 py-6 border-2 border-cyan-400 text-cyan-400 font-semibold text-xl rounded-3xl hover:bg-cyan-400 hover:text-black transition flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-robot"></i> Gegen KI spielen
+                </a>
+                <a href="analysis-board.html" 
+                   class="px-10 py-6 border-2 border-white/60 hover:border-white font-semibold text-xl rounded-3xl transition flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-chart-simple"></i> Analysebrett öffnen
+                </a>
             </div>
         </div>
     </div>
 
     <script>
-        const unicodePieces = {
-            'K':'♔','Q':'♕','R':'♖','B':'♗','N':'♘','P':'♙',
-            'k':'♚','q':'♛','r':'♜','b':'♝','n':'♞','p':'♟'
-        };
-
-        function renderHeroBoard() {
-            const container = document.getElementById('hero-board');
-            const tempChess = new Chess("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
-            
-            container.innerHTML = '';
-            for (let rank = 8; rank >= 1; rank--) {
-                for (let file = 0; file < 8; file++) {
-                    const square = String.fromCharCode(97 + file) + rank;
-                    const piece = tempChess.get(square);
-                    const isLight = (rank + file) % 2 === 1;
-                    
-                    const div = document.createElement('div');
-                    div.className = `chess-square ${isLight ? 'light-square' : 'dark-square'}`;
-                    if (piece) div.innerHTML = `<span>${unicodePieces[piece.type]}</span>`;
-                    container.appendChild(div);
-                }
-            }
-        }
-
-        function quickPlayAI() {
-            alert("Gegen KI spielen wird gestartet...\n\n(Nächste Seite: play.html mit echter Stockfish Engine)");
-        }
-
-        function showLoginModal() {
-            alert("Login-Funktion kommt bald.\n\nAktuell kannst du als Gast weitermachen.");
-        }
-
-        function showRegisterModal() {
-            alert("Willkommen bei ChessQuest!\nDu kannst sofort loslegen.");
-        }
-
-        // Init
-        window.onload = () => {
-            renderHeroBoard();
-            console.log('%c✅ ChessQuest Startseite – Version 2.1 geladen', 'color:#67e8f9; font-size:14px');
-        };
+        console.log("%c✅ ChessQuest – Vollständige Website mit einheitlicher Navigation geladen!", "color:#67e8f9; font-size:16px");
     </script>
 </body>
 </html>
