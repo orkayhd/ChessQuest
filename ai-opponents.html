@@ -15,60 +15,57 @@
         .logo-font { font-family: 'Space Grotesk', sans-serif; }
         
         .glass { 
-            background: rgba(15, 23, 42, 0.92); 
+            background: rgba(255,255,255,0.08); 
             backdrop-filter: blur(20px); 
         }
         
-        /* Chess.com Style */
         .chess-square {
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
         .light { background-color: #f0d9b5; }
         .dark { background-color: #b58863; }
         
         .piece {
-            width: 54px;
-            height: 54px;
+            width: 58px;
+            height: 58px;
             background-size: contain;
             background-repeat: no-repeat;
-            background-position: center;
         }
         
         .tab-button.active {
             border-bottom: 4px solid #22d3ee;
             color: #22d3ee;
+            font-weight: 600;
         }
     </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen">
 
-    <!-- NAVBAR -->
-    <nav class="glass border-b border-white/10 sticky top-0 z-50">
+    <!-- EINHEITLICHE NAVBAR -->
+    <nav class="bg-black/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl">♟️</div>
-                <h1 class="logo-font text-3xl tracking-tighter">ChessQuest</h1>
+                <span class="text-3xl font-bold logo-font tracking-tighter">ChessQuest</span>
             </div>
+
             <div class="flex items-center gap-8 text-sm font-medium">
-                <a href="index.html" class="hover:text-cyan-400 transition-colors">Home</a>
-                <a href="campaign.html" class="hover:text-cyan-400 transition-colors">Kampagne</a>
-                <a href="ai-opponents.html" class="text-cyan-400 font-semibold">KI-Gegner</a>
+                <a href="index.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="campaign.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-map"></i> Kampagne</a>
+                <a href="ai-opponents.html" class="text-cyan-400 font-semibold flex items-center gap-2"><i class="fa-solid fa-robot"></i> KI-Gegner</a>
+                <a href="analysis-board.html" class="hover:text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-chart-simple"></i> Analysebrett</a>
             </div>
-            <div onclick="showCharacterModal()" id="character-preview" class="flex items-center gap-3 cursor-pointer hover:scale-105 transition">
-                <div id="nav-avatar" class="w-9 h-9 rounded-2xl flex items-center justify-center text-2xl shadow-lg"></div>
-                <div>
-                    <p id="nav-name" class="font-semibold"></p>
-                    <p id="nav-elo" class="text-xs text-white/60"></p>
-                </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" class="px-4 py-2 text-sm border border-white/30 rounded-2xl" id="lang-btn">🇩🇪 Deutsch</button>
             </div>
         </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-6 py-12">
-        <h1 class="text-6xl font-bold logo-font tracking-tighter mb-3">KI-Gegner</h1>
+        <h1 class="text-5xl font-bold logo-font tracking-tighter mb-3">KI-Gegner</h1>
         <p class="text-zinc-400 text-xl">Wähle deinen Gegner und verbessere dein Spiel</p>
 
         <!-- TABS -->
@@ -81,22 +78,12 @@
         <div id="tab-content" class="min-h-[500px]"></div>
     </div>
 
-    <!-- CHARACTER MODAL -->
-    <div id="character-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-        <div class="glass rounded-3xl p-10 max-w-md w-full text-center">
-            <h2 class="text-4xl font-bold mb-10">Wähle deinen Helden</h2>
-            <div class="grid grid-cols-2 gap-10">
-                <div onclick="selectCharacter(0)" class="cursor-pointer group">
-                    <div class="text-9xl mx-auto mb-4 transition group-hover:scale-110">🧔</div>
-                    <p class="font-semibold text-2xl">Aetherion</p>
-                </div>
-                <div onclick="selectCharacter(1)" class="cursor-pointer group">
-                    <div class="text-9xl mx-auto mb-4 transition group-hover:scale-110">👩</div>
-                    <p class="font-semibold text-2xl">Lunara</p>
-                </div>
-            </div>
+    <!-- FOOTER -->
+    <footer class="bg-black py-12 border-t border-white/10 mt-20">
+        <div class="max-w-7xl mx-auto px-6 text-center text-zinc-500 text-sm">
+            © 2026 ChessQuest • Professionelle Schachplattform
         </div>
-    </div>
+    </footer>
 
     <!-- GAME MODAL -->
     <div id="game-modal" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center z-[60] p-4">
@@ -117,7 +104,7 @@
                     <div id="chessboard" class="grid grid-cols-8 w-full max-w-[560px] aspect-square rounded-xl overflow-hidden shadow-2xl"></div>
                 </div>
                 <div class="lg:w-96 bg-zinc-950 p-6 flex flex-col">
-                    <div id="move-list" class="flex-1 overflow-y-auto text-sm space-y-1 pr-2"></div>
+                    <div id="move-list" class="flex-1 overflow-y-auto text-sm space-y-1"></div>
                     <button onclick="resignGame()" class="mt-6 py-4 bg-red-600 hover:bg-red-700 rounded-2xl font-medium">Aufgeben</button>
                 </div>
             </div>
@@ -132,21 +119,20 @@
         let selectedSquare = null;
 
         const chessPieces = {
-            'wp': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png',
-            'wr': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png',
-            'wn': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png',
-            'wb': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png',
-            'wq': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png',
-            'wk': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png',
-            'bp': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png',
-            'br': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png',
-            'bn': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png',
-            'bb': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png',
-            'bq': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png',
-            'bk': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png'
+            wp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png",
+            wr: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png",
+            wn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png",
+            wb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png",
+            wq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png",
+            wk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png",
+            bp: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png",
+            br: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png",
+            bn: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png",
+            bb: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png",
+            bq: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png",
+            bk: "https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png"
         };
 
-        // Story-Gegner
         const storyOpponents = [
             {name: "Elias der Anfänger", elo: 500, emoji: "🇩🇪", story: "Junger Schachspieler aus München – lernt noch die Grundlagen."},
             {name: "Anya die Froststrategin", elo: 850, emoji: "❄️", story: "Kalte Präzision aus Sibirien."},
@@ -155,21 +141,6 @@
             {name: "Rajesh der Tempelwächter", elo: 1800, emoji: "🛕", story: "Weiser Philosoph aus Varanasi."},
             {name: "Void Sovereign", elo: 2000, emoji: "🌌", story: "Der mysteriöse Endgegner."}
         ];
-
-        function showCharacterModal() {
-            document.getElementById('character-modal').classList.remove('hidden');
-        }
-
-        function selectCharacter(gender) {
-            currentCharacter = gender === 0 ? 
-                {name: "Aetherion", avatar: "🧔"} : 
-                {name: "Lunara", avatar: "👩"};
-            
-            document.getElementById('nav-avatar').innerHTML = currentCharacter.avatar;
-            document.getElementById('nav-name').textContent = currentCharacter.name;
-            document.getElementById('nav-elo').textContent = "ELO 1423";
-            document.getElementById('character-modal').classList.add('hidden');
-        }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
@@ -195,14 +166,14 @@
                     </div>`;
             } 
             else if (tab === 1) { // ELO-Leiter
-                const ladder = [400, 800, 1200, 1600, 2000, 2400];
+                const levels = [400, 800, 1200, 1600, 2000, 2400];
                 content.innerHTML = `
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        ${ladder.map(elo => `
+                        ${levels.map(elo => `
                             <div onclick='startGameAgainst({name: "KI Level ${elo}", elo: ${elo}, emoji: "♟️", story: "Starke Engine auf ${elo} ELO"})' 
                                  class="glass rounded-3xl p-8 text-center cursor-pointer hover:scale-105 transition-all">
                                 <div class="text-5xl mb-4">♟️</div>
-                                <h3 class="text-3xl font-bold">${elo}</h3>
+                                <h3 class="text-4xl font-bold">${elo}</h3>
                                 <p class="text-zinc-400">ELO</p>
                             </div>
                         `).join('')}
@@ -210,21 +181,21 @@
             } 
             else if (tab === 2) { // Eigener Gegner
                 content.innerHTML = `
-                    <div class="glass rounded-3xl p-12 max-w-xl mx-auto">
-                        <h3 class="text-3xl font-semibold text-center mb-10">Eigenen Gegner erstellen</h3>
+                    <div class="glass rounded-3xl p-12 max-w-xl mx-auto text-center">
+                        <h3 class="text-3xl font-semibold mb-10">Eigenen Gegner erstellen</h3>
                         <div class="space-y-8">
                             <div>
                                 <label class="block text-white/70 mb-2">Name des Gegners</label>
                                 <input id="custom-name" type="text" placeholder="z.B. Shadow Master" 
-                                       class="w-full bg-white/10 border border-white/20 rounded-3xl px-6 py-4 text-lg">
+                                       class="w-full bg-zinc-800 border border-zinc-700 rounded-3xl px-6 py-4 text-lg">
                             </div>
                             <div>
                                 <label class="block text-white/70 mb-2">ELO-Stärke</label>
-                                <input id="custom-elo" type="range" min="200" max="2800" value="1600" step="50"
+                                <input id="custom-elo" type="range" min="200" max="2800" value="1600" step="100"
                                        class="w-full accent-cyan-400" oninput="document.getElementById('elo-val').textContent = this.value">
                                 <div class="flex justify-between text-sm mt-2">
                                     <span>200</span>
-                                    <span id="elo-val" class="font-mono text-2xl font-bold">1600</span>
+                                    <span id="elo-val" class="font-mono text-3xl font-bold">1600</span>
                                     <span>2800</span>
                                 </div>
                             </div>
@@ -266,22 +237,22 @@
 
             for (let rank = 8; rank >= 1; rank--) {
                 for (let file = 0; file < 8; file++) {
-                    const square = String.fromCharCode(97 + file) + rank;
-                    const piece = chess.get(square);
+                    const squareName = String.fromCharCode(97 + file) + rank;
+                    const piece = chess.get(squareName);
                     const isLight = (rank + file) % 2 === 1;
 
                     const squareDiv = document.createElement('div');
                     squareDiv.className = `chess-square ${isLight ? 'light' : 'dark'}`;
-                    squareDiv.dataset.square = square;
+                    squareDiv.dataset.square = squareName;
 
                     if (piece) {
-                        const imgDiv = document.createElement('div');
-                        imgDiv.className = 'piece';
-                        imgDiv.style.backgroundImage = `url('${chessPieces[piece.color + piece.type]}')`;
-                        squareDiv.appendChild(imgDiv);
+                        const pDiv = document.createElement('div');
+                        pDiv.className = 'piece';
+                        pDiv.style.backgroundImage = `url('${chessPieces[piece.color + piece.type]}')`;
+                        squareDiv.appendChild(pDiv);
                     }
 
-                    squareDiv.addEventListener('click', () => handleClick(square));
+                    squareDiv.addEventListener('click', () => handleClick(squareName));
                     boardEl.appendChild(squareDiv);
                 }
             }
@@ -296,7 +267,7 @@
                     renderChessBoard();
 
                     if (!chess.isGameOver()) {
-                        setTimeout(aiMove, 600);
+                        setTimeout(aiMove, 650);
                     } else {
                         endGame();
                     }
@@ -316,21 +287,7 @@
             `).join('');
         }
 
-        // Verbesserte KI
-        function evaluateBoard() {
-            const pieceValue = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
-            let score = 0;
-            const board = chess.board();
-            for (let row of board) {
-                for (let p of row) {
-                    if (p) {
-                        score += (p.color === 'w' ? pieceValue[p.type] : -pieceValue[p.type]);
-                    }
-                }
-            }
-            return score;
-        }
-
+        // Verbesserte KI (Material-Bewertung)
         function aiMove() {
             const moves = chess.moves({verbose: true});
             if (!moves.length) return;
@@ -360,11 +317,21 @@
             if (chess.isGameOver()) endGame();
         }
 
+        function evaluateBoard() {
+            const values = {p:100, n:320, b:330, r:500, q:900, k:20000};
+            let score = 0;
+            const board = chess.board();
+            for (let row of board) {
+                for (let p of row) {
+                    if (p) score += (p.color === 'w' ? values[p.type] : -values[p.type]);
+                }
+            }
+            return score;
+        }
+
         function endGame() {
             const isWin = chess.isCheckmate() && chess.turn() === 'b';
-            alert(isWin ? 
-                `🎉 Du hast ${currentOpponent.name} besiegt!` : 
-                `😔 ${currentOpponent.name} hat gewonnen.`);
+            alert(isWin ? `🎉 Du hast ${currentOpponent.name} besiegt!` : `😔 ${currentOpponent.name} hat gewonnen.`);
             closeGameModal();
         }
 
@@ -378,11 +345,14 @@
             if (confirm("Wirklich aufgeben?")) closeGameModal();
         }
 
+        function toggleLanguage() {
+            alert("Sprachumschaltung wird bald global verfügbar sein.");
+        }
+
         // INIT
         window.onload = function() {
-            if (!currentCharacter) showCharacterModal();
             switchTab(0);
-            console.log('%c✅ ChessQuest AI-Gegner – Voll funktionsfähig mit Chess.com Design!', 'color:#67e8f9; font-weight:bold');
+            console.log("%c✅ ChessQuest KI-Gegner – einheitliches Design fertig!", "color:#67e8f9; font-weight:bold");
         };
     </script>
 </body>
